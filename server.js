@@ -1,22 +1,54 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const net = require('net');
+const fs = require('fs');
 
 const app = express();
-
-// Middleware to parse JSON bodies
 app.use(bodyParser.json());
 
-// Route to accept POST requests with JSON in the body
+function readConfigFile(filePath) {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const lines = content.split('\n');
+
+    const config = {};
+
+    for (let line of lines) {
+        const [key, value] = line.split('=');
+        if (key && value) {
+            config[key.trim()] = value.trim();
+        }
+    }
+
+    return config;
+}
+
+const config = readConfigFile('config.txt');
+const variablesArray = config.orden.split(",");
+console.log(config, variablesArray);
+
+function buildString(item, variables) {
+    const values = [];
+
+    for (let variable of variables) {
+        if (variable in item.data) {
+            values.push(item.data[variable]);
+        } else if (variable in item) {
+            values.push(item[variable]);
+        }
+    }
+
+    return values.join(',');
+}
+
 app.post('/', (req, res) => {
     console.log('Received JSON:', req.body);
 
-    // Convert the JSON to a string and send to the TCP socket
-    const dataToSend = JSON.stringify(req.body);
-
     const client = new net.Socket();
-    client.connect(4000, '192.168.0.44', () => {
-        client.write(dataToSend);
+    client.connect(10000, '192.168.0.44', () => {
+        for (let item of req.body) {
+            const dataToSend = buildString(item, variablesArray);
+            client.write(dataToSend + "\n");
+        }
         client.end();
     });
 
@@ -31,7 +63,6 @@ app.post('/', (req, res) => {
     });
 });
 
-// Start the server
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
+app.listen(config.puerto_POST_Zebra, () => {
+    console.log(`Server is running on port ${config.puerto_POST_Zebra}`);
 });
