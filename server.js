@@ -23,8 +23,11 @@ function readConfigFile(filePath) {
 }
 
 const config = readConfigFile('config.txt');
-const variablesArray = config.orden.split(",").map(item => item.trim());
-console.log({ ...config, orden: variablesArray });
+const { puerto_POST_Zebra, datalogger_ip, puerto_datalogger, orden, terminador_lineas } = config;
+const variablesArray = orden.split(",").map(item => item.trim());
+const terminador = terminador_lineas.replace(/\\n\\r/g, '\n\r').replace(/\\n/g, '\n');
+console.log({ ...config, orden: variablesArray, terminador_lineas: terminador });
+
 
 function buildString(item, variables) {
     const values = [];
@@ -45,10 +48,10 @@ app.post('/zebra/:name', (req, res) => {
     const name = req.params.name;
 
     const client = new net.Socket();
-    client.connect(10000, '192.168.0.44', () => {
+    client.connect(puerto_datalogger, datalogger_ip, () => {
         for (let item of req.body) {
             const dataToSend = buildString({ ...item, name }, variablesArray);
-            client.write(dataToSend + "\n");
+            client.write(dataToSend + terminador);
         }
         client.end();
     });
@@ -64,6 +67,6 @@ app.post('/zebra/:name', (req, res) => {
     });
 });
 
-app.listen(config.puerto_POST_Zebra, () => {
-    console.log(`Server is running on port ${config.puerto_POST_Zebra}`);
+app.listen(puerto_POST_Zebra, () => {
+    console.log(`Server is running on port ${puerto_POST_Zebra}`);
 });

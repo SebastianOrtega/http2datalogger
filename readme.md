@@ -1,6 +1,6 @@
 
 
-Los parametros permitidos en la configuración son: 
+##Los parametros permitidos en la configuración son: 
 
 antenna
 eventNum
@@ -14,4 +14,10 @@ timestamp
 Se separan con comas ejemplo: 
 
 orden=name,antenna,idHex,timestamp
+
+
+##Terminador de líneas
+
+Es el terminador que se agrega al final de cada linea, puede ser \n o \r\n
+
 

@@ -1,4 +1,5 @@
 puerto_POST_Zebra=3000
-dataloger=192.168.0.44
+datalogger_ip=192.168.0.44
 puerto_datalogger=10000
 orden=name,antenna,idHex,timestamp
+terminador_lineas=\n\r
