@@ -23,8 +23,8 @@ function readConfigFile(filePath) {
 }
 
 const config = readConfigFile('config.txt');
-const variablesArray = config.orden.split(",");
-console.log(config, variablesArray);
+const variablesArray = config.orden.split(",").map(item => item.trim());
+console.log({ ...config, orden: variablesArray });
 
 function buildString(item, variables) {
     const values = [];
@@ -40,13 +40,14 @@ function buildString(item, variables) {
     return values.join(',');
 }
 
-app.post('/', (req, res) => {
+app.post('/zebra/:name', (req, res) => {
     console.log('Received JSON:', req.body);
+    const name = req.params.name;
 
     const client = new net.Socket();
     client.connect(10000, '192.168.0.44', () => {
         for (let item of req.body) {
-            const dataToSend = buildString(item, variablesArray);
+            const dataToSend = buildString({ ...item, name }, variablesArray);
             client.write(dataToSend + "\n");
         }
         client.end();
