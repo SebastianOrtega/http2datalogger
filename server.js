@@ -48,17 +48,23 @@ app.post('/zebra/:name', (req, res) => {
     const name = req.params.name;
 
     const client = new net.Socket();
-    client.connect(puerto_datalogger, datalogger_ip, () => {
-        for (let item of req.body) {
-            const dataToSend = buildString({ ...item, name }, variablesArray);
-            client.write(dataToSend + terminador);
-        }
-        client.end();
-    });
+    try {
+        client.connect(puerto_datalogger, datalogger_ip, () => {
+            for (let item of req.body) {
+                const dataToSend = buildString({ ...item, name }, variablesArray);
+                client.write(dataToSend + terminador);
+            }
+            client.end();
+        });
+    } catch (error) {
+        console.error('Error connecting to the socket:', error);
+        res.status(500).send('Error connecting to the TCP socket.');
+        return;
+    }
 
     client.on('error', (error) => {
         console.error('Error with the socket:', error);
-        res.status(500).send('Error communicating with the TCP socket.');
+       // res.status(500).send('Error communicating with the TCP socket.');
     });
 
     client.on('close', () => {
