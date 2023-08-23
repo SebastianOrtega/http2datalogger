@@ -10,15 +10,23 @@ peakRssi
 reads
 name
 timestamp
+localDate
+localTime
+ip
 
 Se separan con comas ejemplo: 
 
-orden=name,antenna,idHex,timestamp
+orden=idHex,name,antenna,date,localDate,localTime,ip
 
 
 ##Terminador de líneas
 
 Es el terminador que se agrega al final de cada linea, puede ser \n o \r\n
+
+##Separador de palabras
+El separador de palabras separa el EPC en bloques de 4 caracteres
+
+separador_palabras=true
 
 ##Prueba
 
