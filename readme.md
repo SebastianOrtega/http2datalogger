@@ -32,7 +32,8 @@ separador_palabras=true
 
 Server Socket: nc -l 10000
 
-###formato de configuración Zebra de envio de datos: 
+###formato de configuración ZEBRA de envio de datos: 
+    
 
 ```http://[ip del server]:[puerto]/zebra/[nombre del lector]```
 
