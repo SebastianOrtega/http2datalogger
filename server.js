@@ -2,9 +2,11 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const net = require('net');
 const fs = require('fs');
+const morgan = require('morgan');
 
 const app = express();
 app.use(bodyParser.json());
+app.use(morgan("tiny"));
 
 function readConfigFile(filePath) {
     const content = fs.readFileSync(filePath, 'utf-8');
@@ -23,7 +25,7 @@ function readConfigFile(filePath) {
 }
 
 const config = readConfigFile('config.txt');
-const { puerto_POST_Zebra, datalogger_ip, puerto_datalogger, orden, terminador_lineas } = config;
+const { user_zebra, password_zebra, url_zebra, puerto_POST_Zebra, datalogger_ip, puerto_datalogger, orden, terminador_lineas } = config;
 const variablesArray = orden.split(",").map(item => item.trim());
 const terminador = terminador_lineas.replace(/\\n\\r/g, '\n\r').replace(/\\n/g, '\n');
 console.log({ ...config, orden: variablesArray, terminador_lineas: terminador });
@@ -46,7 +48,10 @@ function buildString(item, variables) {
 app.post('/zebra/:name', (req, res) => {
     console.log('Received JSON:', req.body);
     const name = req.params.name;
-
+    if (!Array.isArray(req.body)) {
+        res.send('ok');
+        return;
+    }
     const client = new net.Socket();
     try {
         client.connect(puerto_datalogger, datalogger_ip, () => {
@@ -64,7 +69,7 @@ app.post('/zebra/:name', (req, res) => {
 
     client.on('error', (error) => {
         console.error('Error with the socket:', error);
-       // res.status(500).send('Error communicating with the TCP socket.');
+        // res.status(500).send('Error communicating with the TCP socket.');
     });
 
     client.on('close', () => {
@@ -76,3 +81,5 @@ app.post('/zebra/:name', (req, res) => {
 app.listen(puerto_POST_Zebra, () => {
     console.log(`Server is running on port ${puerto_POST_Zebra}`);
 });
+
+
