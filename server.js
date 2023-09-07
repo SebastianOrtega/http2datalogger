@@ -2,9 +2,11 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const net = require('net');
 const fs = require('fs');
+const morgan = require('morgan');
 
 const app = express();
 app.use(bodyParser.json());
+app.use(morgan("tiny"));
 
 function readConfigFile(filePath) {
     const content = fs.readFileSync(filePath, 'utf-8');
@@ -48,6 +50,7 @@ function buildString(item, variables) {
 app.post('/zebra/:name', (req, res) => {
     let ip = matched(req.ip)[0];
     const name = req.params.name;
+
     const client = new net.Socket();
     try {
         client.connect(puerto_datalogger, datalogger_ip, () => {
@@ -95,3 +98,5 @@ process.on('uncaughtException', function (err) {
 app.listen(puerto_POST_Zebra, () => {
     console.log(`Server is running on port ${puerto_POST_Zebra}`);
 });
+
+
