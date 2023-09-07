@@ -49,7 +49,14 @@ function buildString(item, variables) {
 
 app.post('/zebra/:name', (req, res) => {
     let ip = matched(req.ip)[0];
+
     const name = req.params.name;
+
+    if (!Array.isArray(req.body)) {
+        console.log("Llego: ", req.body.type);
+        res.send('ok');
+        return;
+    }
 
     const client = new net.Socket();
     try {
